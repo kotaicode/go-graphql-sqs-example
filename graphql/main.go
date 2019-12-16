@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go/relay"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -44,6 +45,9 @@ func main() {
 	r := mux.NewRouter()
 	r.Handle("/graphql", &relay.Handler{Schema: schema})
 	r.HandleFunc("/", graphiqlHandler)
+
+	//provide prometheus endpoint
+	r.Handle("/metrics", promhttp.Handler())
 
 	srv := &http.Server{
 		Handler: r,
