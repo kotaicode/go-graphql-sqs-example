@@ -5,9 +5,27 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go/relay"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+)
+
+var (
+	graphqlRequests = promauto.NewCounter(
+		prometheus.CounterOpts{
+			Name: "graphql_requests_total",
+			Help: "total number of graphql requests served",
+		},
+	)
+
+	graphiqlRequests = promauto.NewCounter(
+		prometheus.CounterOpts{
+			Name: "graphiql_requests_total",
+			Help: "total number of requests to graphiql ui served",
+		},
+	)
 )
 
 func setupLogger() {
@@ -17,6 +35,9 @@ func setupLogger() {
 }
 
 func graphiqlHandler(w http.ResponseWriter, r *http.Request) {
+	// increase prometheus request count
+	graphiqlRequests.Inc()
+
 	graphiql, err := graphiqlHtmlBytes()
 	if err != nil {
 		log.Fatal().Err(err)

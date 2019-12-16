@@ -30,11 +30,13 @@ func (r *resolver) Hello(args greeting) (string, error) {
 }
 
 func (r *resolver) ReceiveMessage() (string, error) {
+	graphqlRequests.Inc()
 	res, err := receiveSqsMessage()
 	return res, err
 }
 
 func (r *resolver) SendMessage(args greeting) (graphql.ID, error) {
+	graphqlRequests.Inc()
 	sqsId, err := sendSqsMessage(*args.Msg)
 	if err != nil {
 		log.Err(err)
